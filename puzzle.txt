@@ -80,5 +80,5 @@ Puzzle: 155 - target 1AoeP37TmHdFh8uN72fu9AqgtLrUwcv2wJ - ValorBTC 15,50001600
 Puzzle: 156 - target 1FTpAbQa4h8trvhQXjXnmNhqdiGBd1oraE - ValorBTC 15,60001000
 Puzzle: 157 - target 14JHoRAdmJg3XR4RjMDh6Wed6ft6hzbQe9 - ValorBTC 15,70001000
 Puzzle: 158 - target 19z6waranEf8CcP8FqNgdwUe1QRxvUNKBG - ValorBTC 15,80001000
-Puzzle: 159 - target 14u4nA5sugaswb6SZgn5av2vuChdMnD9E5 - ValorBTC 15,90002000\n
-Puzzle: 160 - target 1NBC8uXJy1GiJ6drkiZa1WuKn51ps7EPTv - ValorBTC 16,00019082\n
+Puzzle: 159 - target 14u4nA5sugaswb6SZgn5av2vuChdMnD9E5 - ValorBTC 15,90002000
+Puzzle: 160 - target 1NBC8uXJy1GiJ6drkiZa1WuKn51ps7EPTv - ValorBTC 16,00019082
