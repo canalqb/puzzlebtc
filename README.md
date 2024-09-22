@@ -3,8 +3,13 @@
 Bem-vindo ao repositório **PuzzleBTC**! Este projeto contém dois scripts principais que permitem a geração de partes de uma sequência hexadecimal e a busca de uma chave privada associada a um endereço Bitcoin. A seguir, você encontrará uma descrição de cada script, bem como instruções sobre como configurá-los e utilizá-los.
 
 [![Script modo Compartilhado - premio menor, chance maior]([https://i.sstatic.net/Vp2cE.png](https://i9.ytimg.com/vi/sV80KE9Q5uU/mqdefault.jpg?v=66ee1b63&sqp=CNyJwbcG&rs=AOn4CLCXJmO1Ww3bccPft06tBV2EzfOHEg))](https://youtu.be/sV80KE9Q5uU)
-[![Script modo disponivel para download aqui no https://github.com/canalqb/puzzlebtc - prêmio maior, chance menor!]
 
+O Script Offline, está aberto para todos (sua chance de tirar o maior valor do puzzle ainda não descoberto), tudo depende da sua maquina.
+O Arquivo puzzle.exe tem a mesma condição do script.py, a melhoria é simples, apenas uma pessoa leva o premio, só que todos participam da busca.
+
+[Sozinho](https://blogger.googleusercontent.com/img/a/AVvXsEjN2PkLcH1Li7kbx6xg3kmFrsYhWKSn3INj3y04t0Q6OnXk9W8h1qatuHwzOSYOWNQjD-0kdWOm3aqXBvynU46iaYIczHGev5M55bi4CyfDLISGpx-JrZ0TaOvuuz_NkR_xlj9VL4UOYSebwCX-26RMJEKv_BOkwILhZ4NSRvBEkPH26UKBR-wT5tB_fGqE)
+
+![Sozinho](https://blogger.googleusercontent.com/img/a/AVvXsEjN2PkLcH1Li7kbx6xg3kmFrsYhWKSn3INj3y04t0Q6OnXk9W8h1qatuHwzOSYOWNQjD-0kdWOm3aqXBvynU46iaYIczHGev5M55bi4CyfDLISGpx-JrZ0TaOvuuz_NkR_xlj9VL4UOYSebwCX-26RMJEKv_BOkwILhZ4NSRvBEkPH26UKBR-wT5tB_fGqE)
 ## Scripts
 
 ### 1. GeraBancos.py
