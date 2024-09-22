@@ -2,14 +2,48 @@
 
 Bem-vindo ao repositório **PuzzleBTC**! Este projeto contém dois scripts principais que permitem a geração de partes de uma sequência hexadecimal e a busca de uma chave privada associada a um endereço Bitcoin. A seguir, você encontrará uma descrição de cada script, bem como instruções sobre como configurá-los e utilizá-los.
 
-[![Script modo Compartilhado - premio menor, chance maior]([https://i.sstatic.net/Vp2cE.png](https://i9.ytimg.com/vi/sV80KE9Q5uU/mqdefault.jpg?v=66ee1b63&sqp=CNyJwbcG&rs=AOn4CLCXJmO1Ww3bccPft06tBV2EzfOHEg))](https://youtu.be/sV80KE9Q5uU)
+# Puzzle.exe: Junte-se ao Desafio!
 
-O Script Offline, está aberto para todos (sua chance de tirar o maior valor do puzzle ainda não descoberto), tudo depende da sua maquina.
-O Arquivo puzzle.exe tem a mesma condição do script.py, a melhoria é simples, apenas uma pessoa leva o premio, só que todos participam da busca.
+[![Script em Modo Compartilhado - Prêmio Menor, Chance Maior](https://i.sstatic.net/Vp2cE.png)](https://youtu.be/sV80KE9Q5uU)
 
-[Sozinho](https://blogger.googleusercontent.com/img/a/AVvXsEjN2PkLcH1Li7kbx6xg3kmFrsYhWKSn3INj3y04t0Q6OnXk9W8h1qatuHwzOSYOWNQjD-0kdWOm3aqXBvynU46iaYIczHGev5M55bi4CyfDLISGpx-JrZ0TaOvuuz_NkR_xlj9VL4UOYSebwCX-26RMJEKv_BOkwILhZ4NSRvBEkPH26UKBR-wT5tB_fGqE)
+## Visão Geral
 
-![Sozinho](https://blogger.googleusercontent.com/img/a/AVvXsEjN2PkLcH1Li7kbx6xg3kmFrsYhWKSn3INj3y04t0Q6OnXk9W8h1qatuHwzOSYOWNQjD-0kdWOm3aqXBvynU46iaYIczHGev5M55bi4CyfDLISGpx-JrZ0TaOvuuz_NkR_xlj9VL4UOYSebwCX-26RMJEKv_BOkwILhZ4NSRvBEkPH26UKBR-wT5tB_fGqE)
+Bem-vindo ao **Puzzle.exe**, a ferramenta definitiva para resolver quebra-cabeças criptográficos! Este não é apenas um script; é um esforço colaborativo que potencializa suas chances de sucesso. Enquanto o script offline está disponível para todos, a verdadeira força do **Puzzle.exe** está na união—juntos, podemos alcançar muito mais!
+
+## Por que Baixar o Puzzle.exe?
+
+- **Esforço Colaborativo**: Cada participante contribui para a busca, permitindo que todos compartilhem o sucesso. Embora apenas uma pessoa receba o prêmio, a dedicação é coletiva!
+  
+- **Maior Eficiência**: Em vez de uma única pessoa analisando vastas faixas de dados sozinha, os participantes trabalham em paralelo, eliminando ranges vazias e acelerando o processo de descoberta.
+
+- **Recompensas Reais**: Com o potencial de prêmios superiores a R$ 500.000 (em 22/09/2024), por que encarar esse desafio sozinho?
+
+![Trabalhando Sozinho](https://blogger.googleusercontent.com/img/a/AVvXsEjN2PkLcH1Li7kbx6xg3kmFrsYhWKSn3INj3y04t0Q6OnXk9W8h1qatuHwzOSYOWNQjD-0kdWOm3aqXBvynU46iaYIczHGev5M55bi4CyfDLISGpx-JrZ0TaOvuuz_NkR_xlj9VL4UOYSebwCX-26RMJEKv_BOkwILhZ4NSRvBEkPH26UKBR-wT5tB_fGqE)
+
+## Como Funciona
+
+Imagine um código de barras onde cada linha vertical representa um bilhão de linhas de dados que precisam ser lidas sequencialmente. Fazer isso sozinho levaria uma eternidade.
+
+![Trabalhando em Grupo](https://blogger.googleusercontent.com/img/a/AVvXsEgTd3rpRGej8UcO260bZS418qbi8MfA_4BKWl9P87yVA0l-B05q7AZk-Rn5ZkBXMt0mKKH8pko-n5uTNngk6ZCwK06iDRJM8C-eRx4HjPrTVtr40JOatTRZ3Rx4spTnnvquonW_clUlzd6h_dH9fNvCH1sqcl_95LL2VV8r1sKODucFGtcs5Q5ZaNSQe0Fd)
+
+No nosso modelo colaborativo, os usuários são representados como pequenos quadrados, cada um encarregado de eliminar ranges vazias. Ninguém trabalhará na mesma faixa ao mesmo tempo, garantindo que a busca seja rápida e eficaz.
+
+Quanto mais pessoas aceitarem o desafio de colaborar, menos esforço e tempo cada usuário precisará investir, e mais rápido o grande prêmio será revelado!
+
+Assim que o prêmio for descoberto, eu, Rodrigo do CanalQb, serei notificado e o pagamento de 20% da carteira que está minerando será realizado. 
+
+## Participe Hoje Mesmo!
+
+Ao unir forças, você não apenas aumenta suas chances de ganhar, mas também se torna parte de um esforço comunitário. Lembre-se, há mais de 84 quebra-cabeças para resolver, e à medida que mais pessoas abraçam o trabalho em equipe, nossa ferramenta se torna cada vez mais essencial para descobrir as WIFs dos puzzles.
+
+Não perca a chance de fazer parte de algo maior—baixe o **Puzzle.exe** e comece a colaborar hoje mesmo!
+
+---
+
+Para mais informações, confira nosso [canal no YouTube](https://youtu.be/sV80KE9Q5uU) e prepare-se para embarcar nesta jornada emocionante!
+
+Boa sorte nos puzzles!
+
 ## Scripts
 
 ### 1. GeraBancos.py
