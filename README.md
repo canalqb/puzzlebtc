@@ -58,9 +58,12 @@ Os scripts incluem comentários em suas funções e lógica, além de um sistema
 
 ## Contribuições
 
-Se você deseja contribuir com este projeto, sinta-se à vontade para fazer um fork do repositório e enviar um pull request. Todas as contribuições são bem-vindas!
+Se você deseja contribuir com este projeto, sinta-se à vontade para fazer um fork do repositório e enviar um pull request. Todas as contribuições são bem-vindas!  
 
-## Licença
+## Clonando o Repositório
 
-Este projeto está sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
- 
+Para clonar este repositório, utilize o seguinte comando:
+
+```bash
+git clone https://github.com/seuusuario/seurepositorio.git
+
