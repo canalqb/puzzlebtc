@@ -48,6 +48,10 @@ O segundo script tem como objetivo encontrar uma chave privada correspondente a 
 python Puzzle.py -banco partes_hex_0.db
 ```
 
+### 3. multiacionador.py
+
+Após criar os bancos com o **GeraBancos.py**, utilize o **multiacionador.py** para abrir um puzzle.py separado para cada banco. Lembre-se de que o sistema consome recursos do seu computador, por isso é recomendável usar uma máquina potente.
+
 ## Requisitos
 
 Antes de executar os scripts, você precisa instalar as dependências listadas no arquivo `requirements.txt`. Para isso, execute o seguinte comando no terminal:
