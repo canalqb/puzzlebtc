@@ -4,7 +4,7 @@ Bem-vindo ao repositório **PuzzleBTC**! Este projeto contém dois scripts princ
 
 # Puzzle.exe: Junte-se ao Desafio!
 
-[![Script em Modo Compartilhado - Prêmio Menor, Chance Maior](https://i.sstatic.net/Vp2cE.png)](https://youtu.be/sV80KE9Q5uU)
+[![Script em Modo Compartilhado - Prêmio Menor, Chance Maior](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEij0UCZ_umWsQOc4PoSt_Dwzcy5sLEc_kZ8F5pEYO_dPyaZSIXAFbkdWfAbQ54f4UjWoANsHAXPhO1KOe1eAPhl3i9sgKTsrO29idPxxR8kgSE-4N5imqFTwmWnrtUGiyBI7cFrdJQQw6wMCkg7qykNNT5aHfotHitL9-j59t0ClekUCb5xVkSsxwkDFnkq/s1366-rw/CanalQb%20-%20Puzzle%20BTC%20-%20%20Atualiza%C3%A7%C3%A3o%20do%20programa%20Script%20POOL%20de%20Compartilhamento%20das%20RANGES.png)](https://youtu.be/sV80KE9Q5uU)
 
 ## Visão Geral
 
@@ -40,7 +40,7 @@ Não perca a chance de fazer parte de algo maior—baixe o **Puzzle.exe** e come
 
 ---
 
-Para mais informações, confira nosso [canal no YouTube]([https://youtu.be/sV80KE9Q5uU](https://www.youtube.com/@canalqb)) e prepare-se para embarcar nesta jornada emocionante!
+Para mais informações, confira nosso [canal no YouTube](https://www.youtube.com/@canalqb) e prepare-se para embarcar nesta jornada emocionante!
 
 Boa sorte nos puzzles!
 
