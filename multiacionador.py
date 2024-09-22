@@ -21,11 +21,11 @@ def contar_bancos():  # Função para contar bancos de dados disponíveis.
 
 def iniciar_sessao(banco):  # Função para iniciar uma sessão para um banco específico.
     if sys.platform.startswith('win'):  # Verifica se o sistema é Windows.
-        comando = f'start cmd /k python puzzledb.py -banco {banco}'  # Comando para iniciar o script no cmd.
+        comando = f'start cmd /k python puzzle.py -banco {banco}'  # Comando para iniciar o script no cmd.
         processo = subprocess.Popen(comando, shell=True)  # Executa o comando em um novo processo.
     elif sys.platform.startswith('linux') or sys.platform.startswith('darwin'):  # Verifica se o sistema é Linux ou MacOS.
         sessao_nome = f"sessao_{banco}"  # Define o nome da sessão.
-        comando_tmux = f'tmux new-session -d -s {sessao_nome} "python3 puzzledb.py -banco {banco}"'  # Comando para iniciar uma nova sessão tmux.
+        comando_tmux = f'tmux new-session -d -s {sessao_nome} "python3 puzzle.py -banco {banco}"'  # Comando para iniciar uma nova sessão tmux.
         processo = subprocess.Popen(comando_tmux, shell=True)  # Executa o comando em um novo processo.
         logging.info(f'Sessão {sessao_nome} iniciada para {banco}')  # Registra no log que a sessão foi iniciada.
         logging.debug(f'Comando tmux executado: {comando_tmux}')  # Registra no log o comando executado para depuração.
