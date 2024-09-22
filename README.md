@@ -16,8 +16,8 @@ Certifique-se de que você tem Python 3.x instalado. Este projeto utiliza o mód
 1. **Clone o repositório:**
 
    ```bash
-   git clone https://github.com/seu_usuario/seu_repositorio.git
-   cd seu_repositorio
+   git clone https://github.com/canalqb/puzzlebtc.git
+   cd puzzlebtc
    ```
 
 2. **Execute o script:**
