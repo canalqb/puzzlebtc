@@ -40,7 +40,7 @@ Não perca a chance de fazer parte de algo maior—baixe o **Puzzle.exe** e come
 
 ---
 
-Para mais informações, confira nosso [canal no YouTube](https://youtu.be/sV80KE9Q5uU) e prepare-se para embarcar nesta jornada emocionante!
+Para mais informações, confira nosso [canal no YouTube]([https://youtu.be/sV80KE9Q5uU](https://www.youtube.com/@canalqb)) e prepare-se para embarcar nesta jornada emocionante!
 
 Boa sorte nos puzzles!
 
