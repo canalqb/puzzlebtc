@@ -2,7 +2,8 @@
 
 Bem-vindo ao repositório **PuzzleBTC**! Este projeto contém dois scripts principais que permitem a geração de partes de uma sequência hexadecimal e a busca de uma chave privada associada a um endereço Bitcoin. A seguir, você encontrará uma descrição de cada script, bem como instruções sobre como configurá-los e utilizá-los.
 
-[![Watch the video]([https://i.sstatic.net/Vp2cE.png](https://i9.ytimg.com/vi/sV80KE9Q5uU/mqdefault.jpg?v=66ee1b63&sqp=CNyJwbcG&rs=AOn4CLCXJmO1Ww3bccPft06tBV2EzfOHEg))](https://youtu.be/sV80KE9Q5uU)
+[![Script modo Compartilhado - premio menor, chance maior]([https://i.sstatic.net/Vp2cE.png](https://i9.ytimg.com/vi/sV80KE9Q5uU/mqdefault.jpg?v=66ee1b63&sqp=CNyJwbcG&rs=AOn4CLCXJmO1Ww3bccPft06tBV2EzfOHEg))](https://youtu.be/sV80KE9Q5uU)
+[![Script modo disponivel para download aqui no https://github.com/canalqb/puzzlebtc - prêmio maior, chance menor!]
 
 ## Scripts
 
