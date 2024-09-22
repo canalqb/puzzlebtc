@@ -19,7 +19,7 @@ Este script é responsável por criar bancos de dados SQLite que armazenam parte
 - **gerar_e_salvar_partes_hex(inicial_hex, final_hex, n, target_btc, batch_size)**: Função principal que gera as partes da sequência hexadecimal e as salva em bancos de dados separados.
 
 #### Exemplo de uso:
-### Valores referente a range do 66 descoberta no dia 14/09/2024 até executar o Script note que um arquivo .txt será criado na sua pasta.
+### Valores referentes ao range do 66 descoberto no dia 14/09/2024. Após executar o script, note que um arquivo .txt será criado na sua pasta.
 ```python
 # Valores exemplo
 target_btc = '13zb1hQbWVsc2S7ZTZnP2G4undNNpdh5so'
