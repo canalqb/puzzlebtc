@@ -37,7 +37,7 @@ Assim que o prêmio for descoberto, eu, Rodrigo do CanalQb, serei notificado e o
 Ao unir forças, você não apenas aumenta suas chances de ganhar, mas também se torna parte de um esforço comunitário. Lembre-se, há mais de 84 quebra-cabeças para resolver, e à medida que mais pessoas abraçam o trabalho em equipe, nossa ferramenta se torna cada vez mais essencial para descobrir as WIFs dos puzzles.
 
 Não perca a chance de fazer parte de algo maior—baixe o **Puzzle.exe** e comece a colaborar hoje mesmo!
-
+[Link direto para Download do Puzzle Compartilhado](https://cb.run/P0mJ)
 ---
 
 Para mais informações, confira nosso [canal no YouTube](https://www.youtube.com/@canalqb) e prepare-se para embarcar nesta jornada emocionante!
