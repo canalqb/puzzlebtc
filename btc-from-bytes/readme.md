@@ -85,3 +85,30 @@ Se quiser transformar este projeto em algo funcional:
 Este projeto é distribuído como **open source apenas para fins educacionais**. Nenhuma garantia é fornecida sobre segurança, funcionalidade ou integridade dos dados gerados.
 
 ---
+
+🚀 Como usar
+Clone o repositório:
+
+bash
+Copiar
+Editar
+git clone https://github.com/seu-usuario/byte2btc.git
+cd byte2btc
+Instale com pip:
+
+bash
+Copiar
+Editar
+pip install .
+Execute:
+
+bash
+Copiar
+Editar
+python byte2btc/byte_to_btc.py
+Testes:
+
+bash
+Copiar
+Editar
+pytest
