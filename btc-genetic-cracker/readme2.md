@@ -1,4 +1,4 @@
-# 🔑 Bitcoin Genetic Cracker
+# 🔑 Bitcoin Genetic Cracker - genetic_bitcoin_cracker.py
 
 🚀 **Descubra chaves privadas Bitcoin usando Algoritmos Genéticos e Banco de Dados local**
 
