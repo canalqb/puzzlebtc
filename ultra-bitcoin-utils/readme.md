@@ -1,5 +1,3 @@
----
-
 # 🚀 Ultra Bitcoin Utils - Script Ultra-Otimizado
 
 **Bem-vindo(a) ao Ultra Bitcoin Utils!**
