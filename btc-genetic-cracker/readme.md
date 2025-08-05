@@ -1,4 +1,4 @@
-# 🧬 BTC Genetic Cracker - genetic_bitcoin_cracker.py
+# 🧬 BTC Genetic Cracker - btc_cracker.py
 
 ⚡ Uma ferramenta de força bruta baseada em algoritmo genético para buscar endereços Bitcoin específicos a partir de chaves privadas.</p>
 
