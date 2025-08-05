@@ -1,4 +1,4 @@
-
+## 📁 Objetivo
 ```markdown
 # 📊 Gerador de Tabela de Meios em Decimal
 
@@ -10,6 +10,7 @@ Este projeto gera uma tabela CSV (`Tabela_Corrigida.csv`) a partir de uma lista 
 - Calcular valores derivados com base em potências de dois (`2^n`) e gerar uma tabela estruturada.
 - Evitar notação científica e manter precisão decimal alta com o uso de `decimal.Decimal`.
 
+```
 ## 📁 Estrutura do Projeto
 
 ```
