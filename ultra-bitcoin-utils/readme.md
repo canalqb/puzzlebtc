@@ -1,13 +1,3 @@
-
-### Sugestão de nomes:
-
-* Nome da pasta: `ultra-bitcoin-utils`
-* Nome do script: `ultra_fast_bitcoin.py`
-
----
-
-### README.md já renderizado (como ficaria no GitHub)
-
 ---
 
 # 🚀 Ultra Bitcoin Utils - Script Ultra-Otimizado
