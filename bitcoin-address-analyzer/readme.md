@@ -1,5 +1,3 @@
-Claro! Aqui está a versão corrigida da **formatação do seu README** em Markdown, com ajustes para manter a consistência, clareza e apresentação adequada:
-
 ---
 
 # 🔍 Bitcoin Address Analyzer
@@ -81,13 +79,6 @@ Você pode alterar esses valores diretamente no script conforme necessário.
 
 ## 📬 Contato
 
-Feito por [CanalQb no GitHub](https://github.com/canalqb)
-Visite o blog: [canalqb.blogspot.com](https://canalqb.blogspot.com/)
-
----
-
-Se quiser, posso te ajudar a gerar o `.gitignore` ou estrutura completa do repositório também. Deseja isso?
-
----
-
-Se quiser, posso gerar o `.gitignore` agora mesmo. Deseja incluir dependências como `__pycache__/`, `.env`, `banco.db`, entre outros?
+Feito por [CanalQb no GitHub](https://github.com/canalqb)  
+Visite o blog: [canalqb.blogspot.com](https://canalqb.blogspot.com/)  
+💸 Que tal apoiar a ideia? Bitcoin: `13Ve1k5ivByaCQ5yer6GoV84wAtf3kNava`
