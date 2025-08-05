@@ -1,4 +1,4 @@
-# 📊 Bit Ranges Summary - bit_ranges_summary2.py
+# 📊 Bit Ranges Summary - bit_ranges_summary.py
 
 Bem-vindo ao **Bit Ranges Summary**, um script Python que analisa números inteiros em intervalos de potências de dois e gera uma tabela detalhada com informações sobre a contagem de bits ligados (bits 1) em cada número.
 
