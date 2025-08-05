@@ -1,16 +1,3 @@
-Dêe um nome de pasta, e para o script.
-Crie um readme.md para github  já renderizado, não quero ver a estrutura markdown, explicando para que serve o script 
-Deixe bem explicado e bem formatado, com icones e textos com formatações, de negrito, italico, listas de passo a passo, entre outros
-
-## 📬 Contato
-
-Feito por [CanalQb no GitHub](https://github.com/canalqb)
-Visite o blog: [canalqb.blogspot.com](https://canalqb.blogspot.com/)
-💸 Apoie o projeto via Bitcoin: `13Ve1k5ivByaCQ5yer6GoV84wAtf3kNava`
-
-
-
-
 # --- Constantes de Configuração ---
 DATA_ADDRESS = [
 "122AJhKLEfkFBaGAd84pLp1kfE7xK3GdT8","128z5d7nN7PkCuX5qoA4Ys6pmxUYnEy86k","12CiUhYVTTH33w3SPUBqcpMoqnApAV4WCF","12jbtzBb54r97TCwW3G1gCFoumpckRAPdY","12JzYkkN76xkwvcPT6AWKZtGX6w2LAgsJg",
