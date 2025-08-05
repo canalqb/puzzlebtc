@@ -99,3 +99,5 @@ Valor estimado para 'None': 28351901245
 Feito por [CanalQb no GitHub](https://github.com/canalqb)
 Visite o blog: [canalqb.blogspot.com](https://canalqb.blogspot.com/)
 💸 Apoie o projeto via Bitcoin: `13Ve1k5ivByaCQ5yer6GoV84wAtf3kNava`
+
+--- 
