@@ -1,14 +1,3 @@
-de um nome de pasta, e para o script.
-Crie um readme.md para github explicando para que serve o script
-
-## 📬 Contato
-
-Feito por [CanalQb no GitHub](https://github.com/canalqb)  
-Visite o blog: [canalqb.blogspot.com](https://canalqb.blogspot.com/)  
-💸 Que tal apoiar a ideia? Bitcoin: `13Ve1k5ivByaCQ5yer6GoV84wAtf3kNava`
-
-
-
 import hashlib
 import base58
 from ecdsa import SigningKey, SECP256k1
