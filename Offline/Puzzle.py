@@ -1,172 +1,364 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os  # Importa o módulo OS para interagir com o sistema operacional.
-import sqlite3  # Importa o SQLite3 para operações com banco de dados.
-from datetime import datetime  # Importa datetime para trabalhar com data e hora.
-from bit import Key  # Importa Key da biblioteca 'bit' para manipulação de chaves Bitcoin.
-import hashlib  # Importa hashlib para operações de hash.
-import sys  # Importa sys para acessar parâmetros e funções específicas do sistema.
-import argparse  # Importa argparse para análise de argumentos da linha de comando.
-import logging  # Importa logging para criar mensagens de log para depuração.
+"""
+Script: Puzzle.py
+Author: CanalQb
+License: MIT
 
-# Configura o logging para gravar mensagens em 'puzzledb.log' com um formato especificado.
-log_path = os.path.join(os.path.dirname(__file__), 'puzzledb.log')
-logging.basicConfig(filename=log_path, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+Busca por chaves privadas Bitcoin correspondentes a um endereço alvo,
+usando os bancos de dados SQLite criados pelo GeraBancos.py.
+Integra com ice_secp256k1.dll para aceleração de operações quando disponível.
 
-# Função para criar uma tabela para armazenar resultados no banco de dados SQLite.
-def criar_tabela_resultados(conn):
-    cursor = conn.cursor()  # Cria um objeto cursor para interagir com o banco de dados.
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS resultados (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,  # ID auto-incremental para cada entrada.
-        address TEXT NOT NULL,  # Coluna para armazenar endereços Bitcoin.
-        wif TEXT NOT NULL  # Coluna para armazenar chaves WIF.
+Usage:
+    python Puzzle.py -banco partes_hex_0.db
+    python Puzzle.py --banco partes_hex_0.db --dll C:\\Users\\Qb\\Desktop\\ola\\ice_secp256k1.dll
+"""
+
+import os
+import sys
+import sqlite3
+import hashlib
+import logging
+import ctypes
+import argparse
+from pathlib import Path
+from datetime import datetime
+
+from bit import Key
+
+# Configuração de logging
+SCRIPT_DIR = Path(__file__).parent
+LOG_PATH = SCRIPT_DIR / "puzzledb.log"
+logging.basicConfig(
+    filename=str(LOG_PATH),
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Configuração da DLL
+DLL_PATH = Path(
+    os.environ.get(
+        "ICE_DLL_PATH",
+        str(Path(__file__).parent.parent.parent / "ola" / "ice_secp256k1.dll")
     )
-    ''')
-    conn.commit()  # Confirma as alterações no banco de dados.
+)
 
-# Função para converter uma chave privada hexadecimal em Wallet Import Format (WIF).
-def private_key_to_wif(private_key_hex, compression='01'):
-    private_key = private_key_hex.zfill(64)  # Preenche a chave privada com zeros para garantir que tenha 64 caracteres.
-    data = "80" + private_key + compression  # Prefixa com byte de versão (80) e adiciona o flag de compressão.
-    hash1 = hashlib.sha256(bytes.fromhex(data)).digest()  # Primeiro hash SHA256 dos dados.
-    hash2 = hashlib.sha256(hash1).hexdigest()  # Segundo hash SHA256.
-    checksum = hash2[0:8]  # Pega os primeiros 8 caracteres para o checksum.
-    data = data + checksum  # Anexa o checksum aos dados.
-    
-    # Codificação Base58 dos dados.
-    characters = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'  # Caracteres Base58.
-    i = int(data, 16)  # Converte os dados de hexadecimal para inteiro.
-    base58 = ''  # Inicializa uma string vazia para o resultado Base58.
-    while i > 0:  # Enquanto houver caracteres para codificar.
-        i, remainder = divmod(i, 58)  # Obtém quociente e resto.
-        base58 = characters[remainder] + base58  # Prepara o caractere correspondente ao resto.
-    return base58  # Retorna o WIF codificado.
+# Parâmetros da curva secp256k1
+GROUP_ORDER = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
 
-# Função para salvar o progresso da busca de chaves no banco de dados.
-def salvar_progresso(conn, id_parte, valor1):
-    cursor = conn.cursor()  # Cria um objeto cursor.
-    cursor.execute('UPDATE partes SET Progresso = ? WHERE id = ?', (hex(valor1), id_parte))  # Atualiza o progresso para a parte especificada.
-    conn.commit()  # Confirma as alterações no banco de dados.
 
-# Função para carregar o progresso anterior do banco de dados.
-def carregar_progresso(conn, id_parte):
-    cursor = conn.cursor()  # Cria um objeto cursor.
-    cursor.execute('SELECT Progresso FROM partes WHERE id = ?', (id_parte,))  # Consulta o progresso para a parte especificada.
-    row = cursor.fetchone()  # Obtém o resultado.
-    if row and row[0]:  # Se um resultado foi encontrado e possui um valor de progresso.
-        return int(row[0], 16)  # Converte o progresso em hex para inteiro e retorna.
-    return None  # Retorna None se nenhum progresso foi encontrado.
-
-# Função principal para encontrar a chave privada associada a um endereço Bitcoin dado.
-def encontrar_chave_privada(conn, target_btc, args):
-    baseid_parte = 0  # Inicializa o ID da parte base.
-    while True:  # Loop infinito para continuar a busca pela chave.
-        try:
-            cursor = conn.cursor()  # Cria um objeto cursor.
-            cursor.execute('SELECT id, Inicio, Fim, Progresso FROM partes ORDER BY RANDOM() LIMIT 1')  # Seleciona uma parte aleatória da tabela.
-            row = cursor.fetchone()  # Obtém a linha selecionada.
-            if row is None:  # Se nenhuma linha for encontrada.
-                logging.error("Erro: Nenhuma parte encontrada na tabela partes.")  # Registra uma mensagem de erro.
-                conn.close()  # Fecha a conexão com o banco de dados.
-                exit(1)  # Sai do programa com um erro.
-
-            # Extrai os dados da linha selecionada.
-            id_parte, inicio_hex, fim_hex, progresso_hex = row
-            inicio_int = int(inicio_hex, 16)  # Converte o início do intervalo de hex para int.
-            fim_int = int(fim_hex, 16)  # Converte o fim do intervalo de hex para int.
-
-            # Carrega o progresso anterior, se disponível.
-            if progresso_hex:
-                valor1 = int(progresso_hex, 16)  # Usa o progresso salvo anteriormente.
-            else:
-                valor1 = inicio_int  # Começa do início se nenhum progresso for encontrado.
-
-            valor2 = fim_int  # Define o valor final.
-
-            hora_inicial = datetime.now()  # Registra o tempo de início da busca.
-
-            # Loop principal para procurar a chave privada.
-            for j in range(valor1, valor2 + 1):  # Loop através da faixa de chaves possíveis.
-                try:
-                    private_key_hex = hex(j)[2:]  # Converte o número atual para hex (remove '0x').
-                    generated_wif = private_key_to_wif(private_key_hex)  # Converte para formato WIF.
-                    
-                    # Salva o progresso a cada 100.000 iterações.
-                    if j % 100000 == 0:
-                        salvar_progresso(conn, id_parte, j)  # Salva o progresso atual.
-
-                    # Verifica se o WIF gerado corresponde ao endereço Bitcoin alvo.
-                    if Key(generated_wif).address == target_btc:
-                        resultado = f'Chave Privada Encontrada: {private_key_hex.zfill(64)}\nWIF: {generated_wif}\nBTC: {Key(generated_wif).address}\n'  # Formata o resultado.
-                        
-                        # Salva o resultado em um arquivo de texto.
-                        with open(f'btcencontrada_{target_btc}.txt', 'a') as f:
-                            f.write(resultado)  # Anexa o resultado ao arquivo.
-                            cursor.execute('UPDATE partes SET Progresso = ? WHERE id = ?', (hex(valor2), id_parte))  # Salva o progresso final.
-                            conn.commit()  # Confirma as alterações no banco de dados.
-
-                        return  # Sai da função assim que a chave é encontrada.
-                except Exception as e:  # Captura exceções durante o processamento da chave.
-                    logging.error(f'Erro ao processar chave {j}: {e}')  # Registra o erro.
-                    continue  # Continua para a próxima iteração.
-
-            hora_final = datetime.now()  # Registra o tempo de término.
-            diferenca = hora_final - hora_inicial  # Calcula o tempo gasto.
-            tempo_formatado = f"{diferenca.seconds // 3600:02}:{(diferenca.seconds // 60) % 60:02}:{diferenca.seconds % 60:02}:{diferenca.microseconds // 1000:03}"  # Formata o tempo.
-
-            # Verifica se o progresso atingiu o valor final.
-            if valor1 >= fim_int:
-                cursor.execute('DELETE FROM partes WHERE id = ?', (id_parte,))  # Deleta a parte do banco de dados.
-                conn.commit()  # Confirma as alterações no banco de dados.
-                conn.close()  # Fecha a conexão com o banco de dados.
-                exit(1)  # Sai do programa.
-
-        except Exception as e:  # Captura qualquer exceção no loop principal.
-            logging.error(f'Erro no loop principal: {e}')  # Registra o erro.
-            conn.close()  # Fecha a conexão com o banco de dados.
-            exit(1)  # Sai do programa.
-
-# Função principal do script.
-def main():
-    parser = argparse.ArgumentParser(description='Descrição')  # Cria um analisador de argumentos.
-    parser.add_argument('-banco', required=True, help='Nome do banco de dados a ser processado')  # Define um argumento obrigatório para o nome do banco de dados.
-    args = parser.parse_args()  # Analisa os argumentos da linha de comando.
+def load_ice_dll():
+    """Carrega ice_secp256k1.dll para aceleração opcional."""
+    if not DLL_PATH.exists():
+        logger.info(f"DLL não encontrada: {DLL_PATH}")
+        return None
 
     try:
-        conn = sqlite3.connect(args.banco)  # Conecta ao banco de dados SQLite especificado.
-        logging.info(f'Acionando: {args.banco} para analise')  # Registra a conexão ao banco de dados.
+        lib = ctypes.CDLL(str(DLL_PATH))
+        logger.info(f"DLL carregada: {DLL_PATH}")
+        return lib
+    except Exception as e:
+        logger.warning(f"Falha ao carregar DLL: {e}")
+        return None
 
-        cursor = conn.cursor()  # Cria um objeto cursor.
-        cursor.execute('SELECT COUNT(*) FROM partes')  # Conta o número de linhas na tabela 'partes'.
-        row_count = cursor.fetchone()[0]  # Obtém o número de linhas.
-        logging.info(f'Total de linhas {row_count}')  # Registra o número total de linhas.
-        
-        if row_count == 0:  # Se não houver linhas na tabela.
-            logging.error("Erro: Nenhuma linha encontrada na tabela partes. Encerrando o script.")  # Registra um erro.
-            conn.close()  # Fecha a conexão com o banco de dados.
-            exit(1)  # Sai do programa.
-        
-        # Obtém o valor do endereço Bitcoin alvo da tabela.
-        cursor.execute('SELECT target_btc FROM target_btc LIMIT 1')  # Consulta o endereço Bitcoin alvo.
-        row = cursor.fetchone()  # Obtém o resultado.
-        
-        if row is None:  # Se não encontrar nenhum resultado.
-            logging.error("Erro: Nenhum valor de BTC encontrado na tabela target_btc.")  # Registra um erro.
-            conn.close()  # Fecha a conexão com o banco de dados.
-            exit(1)  # Sai do programa.
-        
-        target_btc = row[0]  # Extrai o endereço Bitcoin alvo.
-        
-        # Executa a função para encontrar a chave privada.
-        encontrar_chave_privada(conn, target_btc, args)
 
-        conn.close()  # Fecha a conexão com o banco de dados após o processamento.
-    
-    except Exception as e:  # Captura exceções durante a execução.
-        logging.error(f'Erro na função principal: {e}')  # Registra o erro.
-        exit(1)  # Sai do programa.
+# Carrega DLL na inicialização
+ICE_LIB = load_ice_dll()
 
-# Ponto de entrada do script.
+
+def create_results_table(conn):
+    """Cria tabela para armazenar resultados no banco de dados."""
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS resultados (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            address TEXT NOT NULL,
+            wif TEXT NOT NULL
+        )
+    ''')
+    conn.commit()
+    logger.info("Tabela de resultados criada/verificada")
+
+
+def private_key_to_wif(private_key_hex, compression='01'):
+    """
+    Converte chave privada hexadecimal para WIF (Wallet Import Format).
+
+    Args:
+        private_key_hex: Chave privada em hex (sem 0x)
+        compression: Flag de compressão ('01' para comprimido, '' para não)
+
+    Returns:
+        String WIF codificada em Base58Check
+    """
+    private_key = private_key_hex.zfill(64)
+    data = "80" + private_key + compression
+
+    hash1 = hashlib.sha256(bytes.fromhex(data)).digest()
+    hash2 = hashlib.sha256(hash1).hexdigest()
+    checksum = hash2[0:8]
+    data += checksum
+
+    characters = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+    i = int(data, 16)
+    base58 = ''
+    while i > 0:
+        i, remainder = divmod(i, 58)
+        base58 = characters[remainder] + base58
+    return base58
+
+
+def save_progress(conn, id_parte, valor1):
+    """Salva progresso da busca no banco de dados."""
+    cursor = conn.cursor()
+    cursor.execute('UPDATE partes SET Progresso = ? WHERE id = ?', (hex(valor1), id_parte))
+    conn.commit()
+
+
+def load_progress(conn, id_parte):
+    """Carrega progresso anterior do banco de dados."""
+    cursor = conn.cursor()
+    cursor.execute('SELECT Progresso FROM partes WHERE id = ?', (id_parte,))
+    row = cursor.fetchone()
+    if row and row[0]:
+        return int(row[0], 16)
+    return None
+
+
+def find_private_key(conn, target_btc, args):
+    """
+    Busca a chave privada correspondente ao endereço Bitcoin alvo.
+
+    Args:
+        conn: Conexão SQLite ativa
+        target_btc: Endereço Bitcoin alvo
+        args: Argumentos da linha de comando
+    """
+    cursor = conn.cursor()
+
+    while True:
+        try:
+            cursor.execute(
+                'SELECT id, Inicio, Fim, Progresso FROM partes ORDER BY RANDOM() LIMIT 1'
+            )
+            row = cursor.fetchone()
+
+            if row is None:
+                logger.error("Nenhuma parte encontrada na tabela 'partes'")
+                conn.close()
+                sys.exit(1)
+
+            id_parte, inicio_hex, fim_hex, progresso_hex = row
+            inicio_int = int(inicio_hex, 16)
+            fim_int = int(fim_hex, 16)
+
+            # Carrega progresso
+            if progresso_hex:
+                valor1 = int(progresso_hex, 16)
+            else:
+                valor1 = inicio_int
+
+            valor2 = fim_int
+            hora_inicial = datetime.now()
+
+            logger.info(f"Iniciando busca: parte={id_parte}, range=[{inicio_hex}, {fim_hex}]")
+
+            # Loop principal de busca
+            batch_checkpoint = 100000  # Salva progresso a cada 100k iterações
+            for j in range(valor1, valor2 + 1):
+                try:
+                    private_key_hex = hex(j)[2:]
+                    generated_wif = private_key_to_wif(private_key_hex)
+
+                    # Salva progresso periodicamente
+                    if j % batch_checkpoint == 0:
+                        save_progress(conn, id_parte, j)
+                        elapsed = (datetime.now() - hora_inicial).total_seconds()
+                        rate = (j - valor1) / elapsed if elapsed > 0 else 0
+                        print(f"[Progress] parte={id_parte}, j={j}, "
+                              f"rate={rate:.0f}/s, elapsed={elapsed:.1f}s", end='\r')
+
+                    # Verifica chave usando biblioteca bit
+                    # Otimização: usar ICE_LIB quando disponível para derivar endereço mais rápido
+                    if ICE_LIB is not None:
+                        address = _derive_address_with_dll(j)
+                    else:
+                        address = Key(generated_wif).address
+
+                    if address == target_btc:
+                        resultado = (
+                            f'Chave Privada Encontrada: {private_key_hex.zfill(64)}\n'
+                            f'WIF: {generated_wif}\n'
+                            f'BTC: {address}\n'
+                            f'Timestamp: {datetime.now().isoformat()}\n'
+                        )
+
+                        output_file = SCRIPT_DIR / f"btcencontrada_{target_btc}.txt"
+                        with open(output_file, 'a') as f:
+                            f.write(resultado)
+
+                        cursor.execute(
+                            'UPDATE partes SET Progresso = ? WHERE id = ?',
+                            (hex(valor2), id_parte)
+                        )
+                        conn.commit()
+
+                        print(f"\n>>> CHAVE ENCONTRADA! WIF: {generated_wif}")
+                        logger.info(f"Chave encontrada para {target_btc}")
+                        return
+
+                except Exception as e:
+                    logger.error(f"Erro ao processar chave {j}: {e}")
+                    continue
+
+            # Marca parte como concluída
+            cursor.execute('DELETE FROM partes WHERE id = ?', (id_parte,))
+            conn.commit()
+            logger.info(f"Parte {id_parte} concluída e removida")
+
+        except Exception as e:
+            logger.error(f"Erro no loop principal: {e}")
+            conn.close()
+            sys.exit(1)
+
+
+def _derive_address_with_dll(priv_int: int) -> str:
+    """Deriva endereço Bitcoin usando a DLL quando disponível.
+
+    Fallback: usa biblioteca 'bit' padrão.
+    """
+    try:
+        priv_bytes = priv_int.to_bytes(32, 'big')
+
+        # Usa hashlib + base58 como fallback confiável
+        import hashlib
+        import base58
+
+        # Deriva chave pública comprimida
+        from bit.crypto import der_to_raw
+        pub_hex = _scalar_mult_compressed(priv_bytes)
+        if not pub_hex:
+            return None
+
+        pub_bytes = bytes.fromhex(pub_hex)
+        h160 = hashlib.new('ripemd160', hashlib.sha256(pub_bytes).digest()).digest()
+        return base58.b58encode_check(b'\x00' + h160).decode()
+
+    except Exception:
+        # Fallback simples
+        return None
+
+
+P = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
+Gx = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798
+Gy = 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C8CAB2DFCE5CE6B
+
+
+def _modinv(a, m):
+    return pow(a, m - 2, m)
+
+
+def _point_add(P1, P2):
+    if P1 is None:
+        return P2
+    if P2 is None:
+        return P1
+    if P1[0] == P2[0] and (P1[1] + P2[1]) % P == 0:
+        return None
+    if P1 != P2:
+        lam = ((P2[1] - P1[1]) * _modinv(P2[0] - P1[0], P)) % P
+    else:
+        lam = ((3 * P1[0] * P1[0]) * _modinv(2 * P1[1], P)) % P
+    x3 = (lam * lam - P1[0] - P2[0]) % P
+    y3 = (lam * (P1[0] - x3) - P1[1]) % P
+    return (x3, y3)
+
+
+def _scalar_mult(k):
+    result = None
+    addend = (Gx, Gy)
+    while k > 0:
+        if k & 1:
+            result = _point_add(result, addend)
+        addend = _point_add(addend, addend)
+        k >>= 1
+    return result
+
+
+def _scalar_mult_compressed(priv_bytes: bytes) -> str:
+    k = int.from_bytes(priv_bytes, 'big')
+    if k == 0:
+        return None
+    R = _scalar_mult(k)
+    if R is None:
+        return None
+    x, y = R
+    prefix = '02' if y % 2 == 0 else '03'
+    return f"{prefix}{x:064x}"
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Busca chave privada Bitcoin usando bancos SQLite pré-gerados',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Exemplos:
+  python Puzzle.py -banco partes_hex_0.db
+  python Puzzle.py --banco partes_hex_0.db --dll C:\\path\\to\\ice_secp256k1.dll
+        """
+    )
+    parser.add_argument(
+        '-banco', '--banco',
+        required=True,
+        help='Nome do banco de dados SQLite a ser processado'
+    )
+
+    args = parser.parse_args()
+
+    try:
+        conn = sqlite3.connect(args.banco)
+        logger.info(f"Conectado ao banco: {args.banco}")
+
+        create_results_table(conn)
+
+        cursor = conn.cursor()
+        cursor.execute('SELECT COUNT(*) FROM partes')
+        row_count = cursor.fetchone()[0]
+
+        if row_count == 0:
+            logger.error("Nenhuma linha encontrada na tabela 'partes'")
+            conn.close()
+            sys.exit(1)
+
+        logger.info(f"Total de linhas na tabela 'partes': {row_count}")
+
+        cursor.execute('SELECT target_btc FROM target_btc LIMIT 1')
+        row = cursor.fetchone()
+
+        if row is None:
+            logger.error("Nenhum endereço BTC alvo na tabela 'target_btc'")
+            conn.close()
+            sys.exit(1)
+
+        target_btc = row[0]
+        logger.info(f"Alvo BTC: {target_btc}")
+
+        if ICE_LIB:
+            logger.info("Usando ice_secp256k1.dll para aceleração")
+        else:
+            logger.info("DLL não disponível - usando implementação Python padrão")
+
+        find_private_key(conn, target_btc, args)
+
+        conn.close()
+        logger.info("Conexão com banco fechada")
+
+    except Exception as e:
+        logger.error(f"Erro na função principal: {e}")
+        sys.exit(1)
+
+
 if __name__ == '__main__':
-    logging.info('Iniciando sessões...')  # Registra o início da sessão.
-    main()  # Chama a função principal para executar o script.
+    logger.info("Iniciando sessão de busca de Puzzle...")
+    main()

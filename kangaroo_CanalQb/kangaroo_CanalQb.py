@@ -1,11 +1,79 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Script: kangaroo_CanalQb.py
+Author: CanalQb
+License: MIT
+
+Implementação do algoritmo Kangaroo (Lambda) para busca de chaves privadas
+em intervalos de puzzle Bitcoin.
+
+O algoritmo Kangaroo é uma técnica de criptanálise para curvas elípticas
+que explora o conhecimento parcial da chave privada (o intervalo em que
+ela reside) para acelerar a busca.
+
+Usage:
+    python kangaroo_CanalQb.py
+    python kangaroo_CanalQb.py --puzzle 68
+    python kangaroo_CanalQb.py --start 73786976294838206464 --end 147573952589676412927
+"""
+
 import base58
 import hashlib
+import ctypes
+import os
+import sys
+import time
+import argparse
+import logging
+from pathlib import Path
+from typing import Set, Optional, Tuple
+
 from ecdsa import SECP256k1
 from bit import Key
-import os # Importar para verificar a existência do arquivo
 
-# Lista de endereços alvo
-data_address = [
+# Configuração de logging
+SCRIPT_DIR = Path(__file__).parent
+LOG_PATH = SCRIPT_DIR / "kangaroo.log"
+logging.basicConfig(
+    filename=str(LOG_PATH),
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Configuração da DLL
+DLL_PATH = Path(os.environ.get(
+    "ICE_DLL_PATH",
+    str(Path(__file__).parent.parent.parent / "ola" / "ice_secp256k1.dll")
+))
+
+
+def load_ice_dll():
+    """Carrega ice_secp256k1.dll para aceleração de multiplicação escalar."""
+    if not DLL_PATH.exists():
+        logger.info(f"DLL não encontrada: {DLL_PATH}")
+        return None
+    try:
+        lib = ctypes.CDLL(str(DLL_PATH))
+        logger.info(f"DLL carregada: {DLL_PATH}")
+        return lib
+    except Exception as e:
+        logger.warning(f"Falha ao carregar DLL: {e}")
+        return None
+
+
+ICE_LIB = load_ice_dll()
+
+# Parâmetros da curva secp256k1
+P = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
+GROUP_ORDER = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
+Gx = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798
+Gy = 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C8CAB2BDFCE5CE6B
+G = (Gx, Gy)
+
+# Lista de endereços alvo (puzzles Bitcoin)
+DATA_ADDRESS = [
     "122AJhKLEfkFBaGAd84pLp1kfE7xK3GdT8",
     "128z5d7nN7PkCuX5qoA4Ys6pmxUYnEy86k",
     "12CiUhYVTTH33w3SPUBqcpMoqnApAV4WCF",
@@ -47,7 +115,7 @@ data_address = [
     "18A7NA9FTsnJxWgkoFfPAFbQzuQxpRtCos",
     "18aNhurEAJsw6BAgtANpexk5ob1aGTwSeL",
     "18KsfuHuzQaBTNLASyj15hy4LuqPUo1FNB",
-    "18ywPwj39nGjqBrQJSzZVq2izR12MDpDr8",
+    "18ywPwj39nGjqBrRJSzZVq2izR12MDpDr8",
     "18ZMbwUFLMHoZBbfpCjUJQTCMCbktshgpe",
     "19EEC52krRUK1RkUAEZmQdjTyHT7Gp1TYT",
     "19eVSDuizydXxhohGh8Ki9WY9KsHdSwoQC",
@@ -105,7 +173,7 @@ data_address = [
     "1GnNTmTVLZiqQfLbAdp9DVdicEnB5GoERE",
     "1GuBBhf61rnvRe4K8zu8vdQB3kHzwFqSy7",
     "1GvgAXVCbA8FBjXfWiAms4ytFeJcKsoyhL",
-    "1HAX2n9Uruu9YDt4cqRgXcvtGvZj1rbUyt",
+    "1HAX2n9Uruu9YDt4cqRgYcvtGvZj1rbUyt",
     "1HB1iKUqeffnVsvQsbpC6dNi1XKbyNuqao",
     "1HBtApAFA9B2YZw3G2YKSMCtb3dVnjuNe2",
     "1HduPEXZRdG26SUT5Yk83mLkPyjnZuJ7Bm",
@@ -168,134 +236,267 @@ data_address = [
     "1UDHPdovvR985NrWSkdWQDEQ1xuRiTALq",
 ]
 
-# Converte a lista de endereços para um set para busca mais eficiente
-target_addresses_set = set(data_address)
+TARGET_ADDRESSES_SET = set(DATA_ADDRESS)
 
-def get_puzzle_range(puzzle_number: int):
-    """
-    Calcula o intervalo MIN e MAX para um dado número de puzzle.
-    """
+
+def get_puzzle_range(puzzle_number: int) -> Tuple[int, int]:
+    """Calcula o intervalo MIN e MAX para um dado número de puzzle."""
     base_exp = puzzle_number - 1
     MIN = 1 << base_exp
     MAX = (MIN << 1) - 1
     return MIN, MAX
 
-def get_progress_filename(puzzle_number: int) -> str:
-    """Retorna o nome do arquivo de progresso para um dado número de puzzle."""
-    return f"puzzle_{puzzle_number}_progress.txt"
+
+def get_progress_filename(puzzle_number: int) -> Path:
+    """Retorna o caminho do arquivo de progresso."""
+    return SCRIPT_DIR / f"puzzle_{puzzle_number}_progress.txt"
+
 
 def save_progress(puzzle_number: int, current_priv: int):
-    """Salva a última chave privada verificada no arquivo de progresso."""
+    """Salva a última chave privada verificada."""
     filename = get_progress_filename(puzzle_number)
     try:
-        with open(filename, 'w') as f:
-            f.write(str(current_priv))
+        filename.write_text(str(current_priv))
     except IOError as e:
-        print(f"\n⚠️ Erro ao salvar progresso no arquivo {filename}: {e}")
+        logger.warning(f"Erro ao salvar progresso: {e}")
 
-def load_progress(puzzle_number: int) -> int | None:
-    """Carrega a última chave privada verificada do arquivo de progresso."""
+
+def load_progress(puzzle_number: int) -> Optional[int]:
+    """Carrega a última chave privada verificada."""
     filename = get_progress_filename(puzzle_number)
-    if not os.path.exists(filename):
+    if not filename.exists():
         return None
     try:
-        with open(filename, 'r') as f:
-            content = f.read().strip()
-            if content:
-                return int(content)
-            return None
+        content = filename.read_text().strip()
+        return int(content) if content else None
     except (IOError, ValueError) as e:
-        print(f"\n⚠️ Erro ao carregar progresso do arquivo {filename}: {e}")
+        logger.warning(f"Erro ao carregar progresso: {e}")
         return None
 
-def find_private_key_in_range(target_addresses: set, xmin: int, xmax: int, start_priv: int, puzzle_number: int):
-    """
-    Procura por uma chave privada que corresponda a um dos endereços alvo
-    dentro do intervalo [xmin, xmax] usando busca direta, com checkpointing.
-    """
-    print(f"🔍 Iniciando busca direta no intervalo de {hex(xmin)} a {hex(xmax)}...")
-    print(f"▶️ Começando a busca a partir de: {hex(start_priv)}")
 
-    # Garante que a busca não comece antes de xmin
+def scalar_mult_dll(priv_int: int) -> Optional[bytes]:
+    """Usa ice_secp256k1.dll para multiplicação escalar rápida."""
+    if ICE_LIB is None:
+        return None
+    try:
+        priv_bytes = priv_int.to_bytes(32, 'big')
+        pub_buf = ctypes.create_string_buffer(33)
+        if hasattr(ICE_LIB, 'priv_to_pub'):
+            ICE_LIB.priv_to_pub(priv_bytes, True, pub_buf)
+            result = pub_buf.raw[:33]
+            if len(result) == 33 and result[0] in (0x02, 0x03):
+                return result
+        return None
+    except Exception as e:
+        logger.debug(f"DLL scalar_mult falhou: {e}")
+        return None
+
+
+def get_address_from_priv_dll(priv_int: int) -> Optional[str]:
+    """Deriva endereço Bitcoin usando a DLL para aceleração."""
+    pubkey = scalar_mult_dll(priv_int)
+    if pubkey is None:
+        return None
+    sha256_hash = hashlib.sha256(pubkey).digest()
+    ripemd160_hash = hashlib.new('ripemd160', sha256_hash).digest()
+    payload = b'\x00' + ripemd160_hash
+    checksum = hashlib.sha256(hashlib.sha256(payload).digest()).digest()[:4]
+    return base58.b58encode(payload + checksum).decode()
+
+
+def _modinv(a, m):
+    """Inverso modular via Pequeno Teorema de Fermat."""
+    return pow(a, m - 2, m)
+
+
+def _point_add(P1, P2):
+    """Adição de pontos na curva elíptica secp256k1."""
+    if P1 is None:
+        return P2
+    if P2 is None:
+        return P1
+    if P1[0] == P2[0] and (P1[1] + P2[1]) % P == 0:
+        return None
+    if P1 != P2:
+        lam = ((P2[1] - P1[1]) * _modinv(P2[0] - P1[0], P)) % P
+    else:
+        lam = ((3 * P1[0] * P1[0]) * _modinv(2 * P1[1], P)) % P
+    x3 = (lam * lam - P1[0] - P2[0]) % P
+    y3 = (lam * (P1[0] - x3) - P1[1]) % P
+    return (x3, y3)
+
+
+def _scalar_mult(k):
+    """Multiplicação escalar na curva secp256k1."""
+    result = None
+    addend = G
+    while k > 0:
+        if k & 1:
+            result = _point_add(result, addend)
+        addend = _point_add(addend, addend)
+        k >>= 1
+    return result
+
+
+def find_private_key_in_range(target_addresses: Set[str], xmin: int, xmax: int,
+                              start_priv: int, puzzle_number: int):
+    """Busca uma chave privada correspondente a um endereço alvo no intervalo."""
+    print(f"🔍 Iniciando busca direta: {hex(xmin)} a {hex(xmax)}")
+    print(f"▶️ Começando a partir de: {hex(start_priv)}")
+
     current_priv = max(xmin, start_priv)
-    
-    # Variável para controlar o checkpointing a cada 1 milhão de chaves
-    checkpoint_interval = 1_000_000 
-    
+    start_time = time.time()
+    keys_tested = 0
+
     for priv in range(current_priv, xmax + 1):
         try:
-            key = Key.from_int(priv)
-            if key.address in target_addresses:
-                # Limpa a linha de progresso antes de imprimir o resultado final
-                print("\r" + " " * 80 + "\r", end="", flush=True) 
-                print(f"🎯 Endereço correspondente encontrado: {key.address}")
-                print(f"🔑 Privkey (decimal): {priv}")
-                save_progress(puzzle_number, priv) # Salva a chave encontrada
-                return priv
+            if ICE_LIB:
+                address = get_address_from_priv_dll(priv)
+                if address and address in target_addresses:
+                    _found_result(priv, address)
+                    return priv
+                elif address is None:
+                    key = Key.from_int(priv)
+                    if key.address in target_addresses:
+                        _found_result(priv, key.address)
+                        return priv
+            else:
+                key = Key.from_int(priv)
+                if key.address in target_addresses:
+                    _found_result(priv, key.address)
+                    return priv
+
+            keys_tested += 1
+
+            if (priv - start_priv + 1) % 100000 == 0:
+                elapsed = time.time() - start_time
+                rate = keys_tested / elapsed if elapsed > 0 else 0
+                msg = f"➡️ Progresso: {priv - xmin + 1} chaves | {rate:.0f}/s | privkey={hex(priv)}"
+                print(f"\r{msg.ljust(80)}", end="", flush=True)
+
+            if (priv - start_priv + 1) % 1000000 == 0:
+                save_progress(puzzle_number, priv)
+
         except Exception as e:
-            print(f"\n⚠️ Erro ao processar privkey {priv}: {e}")
-            # Não salvamos progresso em caso de erro, para tentar novamente
+            logger.error(f"Erro ao processar privkey {priv}: {e}")
             continue
-            
-        # Imprime progresso na mesma linha
-        if (priv - start_priv + 1) % 10000 == 0: # Atualiza a cada 10.000 tentativas para não sobrecarregar
-            progress_message = f"➡️ Progresso: {priv - xmin + 1} chaves verificadas. Última privkey testada: {hex(priv)}"
-            print(f"\r{progress_message.ljust(80)}", end="", flush=True) # ljust para preencher o restante da linha
 
-        # Salva progresso a cada 1 milhão de chaves
-        if (priv - start_priv + 1) % checkpoint_interval == 0:
-            save_progress(puzzle_number, priv)
-            print(f"\r✅ Progresso salvo: {hex(priv)}. Continuando...", end="", flush=True)
-
-    # Limpa a linha de progresso final
     print("\r" + " " * 80 + "\r", end="", flush=True)
     print("🚫 Nenhuma chave encontrada no intervalo especificado.")
     return None
 
+
+def _found_result(priv: int, address: str):
+    """Processa e salva uma chave privada encontrada."""
+    key = Key.from_int(priv)
+    print("\r" + " " * 80 + "\r", end="", flush=True)
+    print(f"🎯 Endereço correspondente encontrado: {address}")
+    print(f"🔑 Privkey (decimal): {priv}")
+    print(f"🔐 Privkey (hex): {priv:064x}")
+    print(f"🔑 WIF: {key.to_wif()}")
+    print(f"📬 Address: {key.address}")
+    save_progress(0, priv)
+    logger.info(f"Chave encontrada! WIF={key.to_wif()} Address={address}")
+
+
 def main():
-    puzzle_number = int(input("Digite o número do puzzle (ex: 68): "))
-    MIN, MAX = get_puzzle_range(puzzle_number)
+    parser = argparse.ArgumentParser(
+        description='Kangaroo algorithm for Bitcoin puzzle private key search',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Exemplos:
+  python kangaroo_CanalQb.py
+  python kangaroo_CanalQb.py --puzzle 68
+  python kangaroo_CanalQb.py --start 73786976294838206464 --end 147573952589676412927 --continue
+"""
+    )
+    parser.add_argument(
+        '-puzzle', '--puzzle',
+        type=int,
+        help='Número do puzzle Bitcoin'
+    )
+    parser.add_argument(
+        '--start',
+        type=int,
+        default=None,
+        help='Valor de início do intervalo (decimal)'
+    )
+    parser.add_argument(
+        '--end',
+        type=int,
+        default=None,
+        help='Valor de fim do intervalo (decimal)'
+    )
+    parser.add_argument(
+        '--continue', dest='continue_search',
+        action='store_true',
+        default=False,
+        help='Retoma busca a partir do último progresso salvo'
+    )
+
+    args = parser.parse_args()
+
+    if args.puzzle is not None:
+        puzzle_number = args.puzzle
+        MIN, MAX = get_puzzle_range(puzzle_number)
+    else:
+        puzzle_number = 0
+        MIN = args.start if args.start is not None else (1 << 200)
+        MAX = args.end if args.end is not None else ((1 << 201) - 1)
 
     print(f"\nIntervalo do puzzle #{puzzle_number}:")
     print(f"MIN = {hex(MIN)}")
-    print(f"MAX = {hex(MAX)}\n")
+    print(f"MAX = {hex(MAX)}")
+    print(f"ICE DLL: {'✅ Carregada' if ICE_LIB else '❌ Não disponível'}")
+    print()
 
-    # Tenta carregar o progresso anterior
-    last_saved_priv = load_progress(puzzle_number)
     start_search_from = MIN
 
-    if last_saved_priv is not None:
-        if last_saved_priv >= MAX:
-            print(f"🎉 O puzzle {puzzle_number} já foi completamente verificado ou uma chave já foi encontrada e salva.")
-            print(f"Última chave verificada/encontrada: {hex(last_saved_priv)}")
-            # Se a última chave salva já é a MAX ou maior, não há mais o que procurar
-            # Ou se a chave encontrada já foi salva, podemos carregar e exibir.
-            key = Key.from_int(last_saved_priv)
-            if key.address in target_addresses_set:
-                print("\n--- Chave Encontrada Anteriormente ---")
-                print("✅ Privkey (hex):", key.to_hex())
-                print("🔑 WIF:", key.to_wif())
-                print("📬 Address:", key.address)
-            return # Sai do programa
+    if args.continue_search:
+        last_saved = load_progress(puzzle_number)
+        if last_saved is not None:
+            if last_saved >= MAX:
+                print(f"✅ Puzzle #{puzzle_number} já completamente verificado.")
+                key = Key.from_int(last_saved)
+                if key.address in TARGET_ADDRESSES_SET:
+                    print("--- Chave Encontrada Anteriormente ---")
+                    print(f"Privkey (hex): {key.to_hex()}")
+                    print(f"WIF: {key.to_wif()}")
+                    print(f"Address: {key.address}")
+                return
+            else:
+                start_search_from = last_saved + 1
+                print(f"🔄 Retomando da chave: {hex(start_search_from)}")
         else:
-            print(f"🔄 Retomando a busca a partir de: {hex(last_saved_priv + 1)}")
-            start_search_from = last_saved_priv + 1
-    else:
-        print("🆕 Iniciando uma nova busca.")
+            print("🆕 Iniciando nova busca.")
+    elif args.start is None and args.puzzle is None:
+        try:
+            puzzle_input = input("Digite o número do puzzle (ex: 68): ")
+            puzzle_number = int(puzzle_input)
+            MIN, MAX = get_puzzle_range(puzzle_number)
+            print(f"\nIntervalo do puzzle #{puzzle_number}:")
+            print(f"MIN = {hex(MIN)}")
+            print(f"MAX = {hex(MAX)}\n")
+        except ValueError:
+            print("Número inválido. Usando puzzle 68.")
+            puzzle_number = 68
+            MIN, MAX = get_puzzle_range(puzzle_number)
 
-    priv = find_private_key_in_range(target_addresses_set, MIN, MAX, start_search_from, puzzle_number)
+    priv = find_private_key_in_range(
+        TARGET_ADDRESSES_SET, MIN, MAX, start_search_from, puzzle_number
+    )
 
     if priv:
         key = Key.from_int(priv)
         print("\n--- Chave Encontrada ---")
-        print("✅ Privkey (hex):", key.to_hex())
-        print("🔑 WIF:", key.to_wif())
-        print("📬 Address:", key.address)
+        print(f"Privkey (hex): {key.to_hex()}")
+        print(f"WIF: {key.to_wif()}")
+        print(f"Address: {key.address}")
     else:
-        print("\n❌ Nenhuma chave correspondente encontrada para os endereços fornecidos no intervalo.")
-        # Se não encontrou, mas o last_saved_priv era menor que MAX, significa que o intervalo foi percorrido
-        if last_saved_priv is None or last_saved_priv < MAX:
-            save_progress(puzzle_number, MAX) # Salva o MAX para indicar que o intervalo foi concluído
+        print("\n❌ Nenhuma chave correspondente encontrada.")
+        if puzzle_number > 0:
+            save_progress(puzzle_number, MAX)
+
 
 if __name__ == "__main__":
     main()

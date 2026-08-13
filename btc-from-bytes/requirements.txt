@@ -1,6 +1,4 @@
 base58
 bech32
-base58
-bech32
 ecdsa
 pytest

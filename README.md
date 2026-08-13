@@ -1,116 +1,179 @@
-# README do Repositório PuzzleBTC
+# Puzzle Bitcoin (puzzlebtc)
 
-Bem-vindo ao repositório **PuzzleBTC**! Este projeto contém dois scripts principais que permitem a geração de partes de uma sequência hexadecimal e a busca de uma chave privada associada a um endereço Bitcoin. A seguir, você encontrará uma descrição de cada script, bem como instruções sobre como configurá-los e utilizá-los.
-
-# Puzzle.exe: Junte-se ao Desafio!
-
-[![Script em Modo Compartilhado - Prêmio Menor, Chance Maior](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEij0UCZ_umWsQOc4PoSt_Dwzcy5sLEc_kZ8F5pEYO_dPyaZSIXAFbkdWfAbQ54f4UjWoANsHAXPhO1KOe1eAPhl3i9sgKTsrO29idPxxR8kgSE-4N5imqFTwmWnrtUGiyBI7cFrdJQQw6wMCkg7qykNNT5aHfotHitL9-j59t0ClekUCb5xVkSsxwkDFnkq/s1366-rw/CanalQb%20-%20Puzzle%20BTC%20-%20%20Atualiza%C3%A7%C3%A3o%20do%20programa%20Script%20POOL%20de%20Compartilhamento%20das%20RANGES.png)](https://youtu.be/sV80KE9Q5uU)
+Scripts para busca e resolução de puzzles Bitcoin (private keys em intervalos específicos).
 
 ## Visão Geral
 
-Bem-vindo ao **Puzzle.exe**, a ferramenta definitiva para resolver quebra-cabeças criptográficos! Este não é apenas um script; é um esforço colaborativo que potencializa suas chances de sucesso. Enquanto o script offline está disponível para todos, a verdadeira força do **Puzzle.exe** está na união—juntos, podemos alcançar muito mais!
+Este repositório contém scripts para buscar chaves privadas Bitcoin dentro de intervalos específicos definidos pelos [puzzles Bitcoin](https://privatekeys.github.io/). Cada puzzle define um intervalo `[2^N, 2^(N+1)-1]` e a chave privada está dentro desse intervalo.
 
-## Por que Baixar o Puzzle.exe?
+## Estrutura do Repositório
 
-- **Esforço Colaborativo**: Cada participante contribui para a busca, permitindo que todos compartilhem o sucesso. Embora apenas uma pessoa receba o prêmio, a dedicação é coletiva!
-  
-- **Maior Eficiência**: Em vez de uma única pessoa analisando vastas faixas de dados sozinha, os participantes trabalham em paralelo, eliminando ranges vazias e acelerando o processo de descoberta.
-
-- **Recompensas Reais**: Com o potencial de prêmios superiores a R$ 500.000 (em 22/09/2024), por que encarar esse desafio sozinho?
-
-![Trabalhando Sozinho](https://blogger.googleusercontent.com/img/a/AVvXsEjN2PkLcH1Li7kbx6xg3kmFrsYhWKSn3INj3y04t0Q6OnXk9W8h1qatuHwzOSYOWNQjD-0kdWOm3aqXBvynU46iaYIczHGev5M55bi4CyfDLISGpx-JrZ0TaOvuuz_NkR_xlj9VL4UOYSebwCX-26RMJEKv_BOkwILhZ4NSRvBEkPH26UKBR-wT5tB_fGqE)
-
-## Como Funciona
-
-Imagine um código de barras onde cada linha vertical representa um bilhão de linhas de dados que precisam ser lidas sequencialmente. Fazer isso sozinho levaria uma eternidade.
-
-![Trabalhando em Grupo](https://blogger.googleusercontent.com/img/a/AVvXsEgTd3rpRGej8UcO260bZS418qbi8MfA_4BKWl9P87yVA0l-B05q7AZk-Rn5ZkBXMt0mKKH8pko-n5uTNngk6ZCwK06iDRJM8C-eRx4HjPrTVtr40JOatTRZ3Rx4spTnnvquonW_clUlzd6h_dH9fNvCH1sqcl_95LL2VV8r1sKODucFGtcs5Q5ZaNSQe0Fd)
-
-No nosso modelo colaborativo, os usuários são representados como pequenos quadrados, cada um encarregado de eliminar ranges vazias. Ninguém trabalhará na mesma faixa ao mesmo tempo, garantindo que a busca seja rápida e eficaz.
-
-Quanto mais pessoas aceitarem o desafio de colaborar, menos esforço e tempo cada usuário precisará investir, e mais rápido o grande prêmio será revelado!
-
-Assim que o prêmio for descoberto, eu, Rodrigo do CanalQb, serei notificado e o pagamento de 20% da carteira que está minerando será realizado. 
-
-## Participe Hoje Mesmo!
-
-Ao unir forças, você não apenas aumenta suas chances de ganhar, mas também se torna parte de um esforço comunitário. Lembre-se, há mais de 84 quebra-cabeças para resolver, e à medida que mais pessoas abraçam o trabalho em equipe, nossa ferramenta se torna cada vez mais essencial para descobrir as WIFs dos puzzles.
-
-Não perca a chance de fazer parte de algo maior—baixe o **Puzzle.exe** e comece a colaborar hoje mesmo!
-[Link direto para Download do Puzzle Compartilhado](https://cb.run/P0mJ)
----
-
-Para mais informações, confira nosso [canal no YouTube](https://www.youtube.com/@canalqb) e prepare-se para embarcar nesta jornada emocionante!
-
-Boa sorte nos puzzles!
-
-## Scripts
-
-### 1. GeraBancos.py
-
-Este script é responsável por criar bancos de dados SQLite que armazenam partes de uma sequência hexadecimal. 
-
-#### Funções principais:
-- **criar_tabelas(conn)**: Cria as tabelas necessárias no banco de dados, caso não existam.
-- **dividir_sequencia_hex(inicial_hex, final_hex, n)**: Divide uma sequência hexadecimal em `n` partes e calcula o intervalo entre elas.
-- **salvar_em_db(partes, conn)**: Salva as partes geradas na tabela `partes` do banco de dados.
-- **ler_ultimo_indice(conn, inicial, intervalo)**: Lê o último índice processado e retorna seu valor.
-- **gerar_e_salvar_partes_hex(inicial_hex, final_hex, n, target_btc, batch_size)**: Função principal que gera as partes da sequência hexadecimal e as salva em bancos de dados separados.
-
-#### Exemplo de uso:
-### Valores referentes ao range do 66 descoberto no dia 14/09/2024. Após executar o script, note que um arquivo .txt será criado na sua pasta.
-```python
-# Valores exemplo
-target_btc = '13zb1hQbWVsc2S7ZTZnP2G4undNNpdh5so'
-inicial_hex = "0x2832ed74f2b5e25ee"
-final_hex = "0x2832ed74f2b5e35ee"
-n = 10**9  # número de partes
-batch_size = 1000000
-totaldebancos = 20
-
-gerar_e_salvar_partes_hex(inicial_hex, final_hex, n, target_btc, batch_size)
 ```
-
-### 2. Puzzle.py
-
-O segundo script tem como objetivo encontrar uma chave privada correspondente a um endereço Bitcoin específico. Ele utiliza os dados armazenados no banco de dados criado pelo `GeraBancos.py`.
-
-#### Funções principais:
-- **criar_tabela_resultados(conn)**: Cria a tabela onde os resultados (chaves encontradas) serão armazenados.
-- **private_key_to_wif(private_key_hex, compression='01')**: Converte uma chave privada em formato hexadecimal para o formato WIF.
-- **salvar_progresso(conn, id_parte, valor1)**: Salva o progresso do processamento no banco de dados.
-- **carregar_progresso(conn, id_parte)**: Carrega o progresso anterior de uma parte.
-- **encontrar_chave_privada(conn, target_btc, args)**: A função principal que busca a chave privada correspondente ao endereço Bitcoin.
-
-#### Exemplo de uso:
-```bash
-python Puzzle.py -banco partes_hex_0.db
+puzzlebtc/
+├── Offline/                          # Scripts offline de geração e busca
+│   ├── GeraBancos.py                 # Gera bancos SQLite com intervalos hex
+│   ├── Puzzle.py                     # Busca direta usando bancos SQLite
+│   ├── multiacionador.py             # Gerenciador multiprocesso de sessões
+│   └── requirements.txt              # Dependências do módulo Offline
+├── btc-from-bytes/                   # Geração de chaves a partir de bytes
+│   ├── btc_keygen.py                 # Geração de chaves e endereços Bitcoin
+│   ├── test_byte_to_btc.py           # Testes unitários
+│   ├── setup.py                      # Setup do pacote
+│   └── requirements.txt              # Dependências
+├── btc-genetic-cracker/              # Cracker genético
+│   └── btc_cracker.py                # Algoritmo genético (DEAP)
+├── btc-genetic-finder/               # Busca genética
+│   └── btc_bruteforce_ga.py          # Brute force genético
+├── kangaroo_CanalQb/                 # Algoritmo Kangaroo
+│   └── kangaroo_CanalQb.py           # Implementação do Kangaroo
+├── btc-multiplicador-checker/        # Validador por múltiplos
+│   └── multiplicador_enderecos_validador.py
+├── ultra-bitcoin-utils/              # Utilitários otimizados
+│   └── ultra_fast_bitcoin.py         # Geração ultra-rápida de chaves
+├── btc-address-scanner/              # Scanner de endereços
+│   └── gerador_chaves_validador.py   # Gerador e validador
+├── bitcoin-private-key-scanner/      # Scanner avançado
+│   ├── find_matching_bitcoin_address.py
+│   └── find_matching_bitcoin_address2.py
+├── bitcoin-wif-generator/            # Gerador WIF
+│   └── generate_wif_keys.py
+├── bitcoin_address_analyzer/         # Analisador de endereços
+│   └── address_length_report.py
+├── int-to-wif-converter/             # Conversor int -> WIF
+│   └── convert_int_to_wif.py
+├── interval-target-search/           # Busca por intervalo alvo
+│   └── search_target.py
+├── multi_base_key_converter/         # Conversor multi-base
+│   └── gerar_chaves_multibase.py
+├── log2-midpoint-estimator/          # Estimador log2
+│   └── prever_meio_intervalo.py
+├── btc_normalizer/                   # Normalizador BTC
+│   └── normalizador_hex_proporcional.py
+└── puzzle.txt                        # Lista de endereços alvo
 ```
-
-### 3. multiacionador.py
-
-Após criar os bancos com o **GeraBancos.py**, utilize o **multiacionador.py** para abrir um puzzle.py separado para cada banco. Lembre-se de que o sistema consome recursos do seu computador, por isso é recomendável usar uma máquina potente.
 
 ## Requisitos
 
-Antes de executar os scripts, você precisa instalar as dependências listadas no arquivo `requirements.txt`. Para isso, execute o seguinte comando no terminal:
+### Python 3.8+
+
+### Dependências Principais
 
 ```bash
-pip install -r requirements.txt
+pip install ecdsa bit base58 bech32 psutil deap requests numpy
 ```
 
-## Comentários e Log
-
-Os scripts incluem comentários em suas funções e lógica, além de um sistema de logging que registra eventos e erros em um arquivo chamado `puzzledb.log`.
-
-## Contribuições
-
-Se você deseja contribuir com este projeto, sinta-se à vontade para fazer um fork do repositório e enviar um pull request. Todas as contribuições são bem-vindas!  
-
-## Clonando o Repositório
-
-Para clonar este repositório, utilize o seguinte comando:
+### Instalação por Módulo
 
 ```bash
-git clone https://github.com/seuusuario/seurepositorio.git
+# Módulo Offline
+cd Offline && pip install -r requirements.txt
 
+# Módulo btc-from-bytes
+cd btc-from-bytes && pip install -r requirements.txt && pip install -e .
+```
+
+### Aceleração com ice_secp256k1.dll (Opcional)
+
+Para aceleração de operações de multiplicação escalar, coloque a `ice_secp256k1.dll` em `C:\Users\Qb\Desktop\ola\` ou defina a variável de ambiente:
+
+```bash
+# Windows
+set ICE_DLL_PATH=C:\Users\Qb\Desktop\ola\ice_secp256k1.dll
+
+# Linux/Mac
+export ICE_DLL_PATH=/c/Users/Qb/Desktop/ola/ice_secp256k1.dll
+```
+
+## Uso
+
+### 1. Geração de Bancos de Dados (Offline)
+
+Gera bancos SQLite com intervalos hexadecimais para busca distribuída:
+
+```bash
+cd Offline
+python GeraBancos.py \
+  --target 13zb1hQbWVsc2S7ZTZnP2G4undNNpdh5so \
+  --start 0x2832ed74f2b5e25ee \
+  --end 0x2832ed74f2b5e35ee \
+  --parts 1000000000 \
+  --batch 1000000 \
+  --dbs 20
+```
+
+### 2. Busca com Kangaroo
+
+```bash
+cd kangaroo_CanalQb
+python kangaroo_CanalQb.py --puzzle 68
+python kangaroo_CanalQb.py --start 73786976294838206464 --end 147573952589676412927 --continue
+```
+
+### 3. Busca Direta (Puzzle.py)
+
+```bash
+cd Offline
+python Puzzle.py -banco partes_hex_0.db
+```
+
+### 4. Gerenciador Multiprocesso
+
+```bash
+cd Offline
+python multiacionador.py -num_sessoes 4
+```
+
+### 5. Converção int -> WIF
+
+```bash
+cd int-to-wif-converter
+python convert_int_to_wif.py --range 66
+python convert_int_to_wif.py --int 83
+```
+
+### 6. Análise Ultra-Rápida
+
+```bash
+cd ultra-bitcoin-utils
+python ultra_fast_bitcoin.py --db /path/to/banco.db --n 20
+```
+
+### 7. Algoritmo Genético
+
+```bash
+cd btc-genetic-cracker
+python btc_cracker.py --bits 64 --pop-size 500 --max-gen 1000
+```
+
+### 8. Busca Genética
+
+```bash
+cd btc-genetic-finder
+python btc_bruteforce_ga.py --bits 71
+```
+
+## Integração com ice_secp256k1.dll
+
+Scripts que suportam aceleração via DLL:
+- `kangaroo_CanalQb/kangaroo_CanalQb.py` - Multiplicação escalar otimizada
+- `ultra-bitcoin-utils/ultra_fast_bitcoin.py` - Geração de chaves públicas
+- `Offline/Puzzle.py` - Derivação de endereços durante busca
+- `int-to-wif-converter/convert_int_to_wif.py` - Carregamento da DLL
+
+## Testes
+
+```bash
+cd btc-from-bytes
+pip install pytest
+pytest test_byte_to_btc.py -v
+```
+
+## Licença
+
+MIT License - veja LICENSE para detalhes.
+
+## Créditos
+
+- Puzzles Bitcoin: [privatekeys.github.io](https://privatekeys.github.io/)
+- ice_secp256k1.dll: Biblioteca nativa de aceleração secp256k1
+- Autor: CanalQb ([@canalqb](https://github.com/canalqb))

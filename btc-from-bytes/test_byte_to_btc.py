@@ -1,5 +1,5 @@
 import pytest
-from byte2btc.byte_to_btc import (
+from btc_keygen import (
     normalizar_array,
     calculate_entropy,
     private_key_to_wif_compressed

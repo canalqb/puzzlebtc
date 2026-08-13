@@ -1,8 +1,45 @@
-# Ignorar o arquivo .env
+# Ignorar arquivos de ambiente
 .env
+*.env
 
-# Ignorar a pasta node_modules (se houver)
+# Ignorar ambiente virtual
+venv/
+.venv/
+env/
+
+# Ignorar cache de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Dependências de Node (se houver)
 node_modules/
 
-# Ignorar arquivos de log
+# Arquivos de log
 *.log
+puzzledb.log
+
+# Bancos de dados
+*.db
+*.sqlite
+*.sqlite3
+
+# Arquivos de saída gerados pelos scripts
+*_endereco_encontrado.txt
+enderecos_encontrados.txt
+checkpoint.txt
+hex_intervalo_normalizado.csv
+wif_masters.txt
+wif_derived*.txt
+
+# Diretórios de saída
+output/
+wifs_encontrados/
+separados_wif/
+
+# Arquivos temporários
+*.tmp
+*.bak
+*.swp
+.DS_Store
