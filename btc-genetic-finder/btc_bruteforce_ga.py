@@ -38,11 +38,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Configuração da DLL
-DLL_PATH = Path(os.environ.get(
-    "ICE_DLL_PATH",
-    str(Path(__file__).parent.parent.parent / "ola" / "ice_secp256k1.dll")
+# Configuração via ambiente (compátibilidade Windows/Linux/Mac)
+# O caminho da DLL é resolvido pela variável de ambiente ICE_DLL_PATH.
+# Configuração da DLL (via ambiente ou relativa ao repo root)
+DLL_DIR = Path(os.environ.get(
+    "ICE_DLL_DIR",
+    str(Path(__file__).parent.parent)  # repo root
 ))
+DLL_PATH = DLL_DIR / "ice_secp256k1.dll"
 
 
 def load_ice_dll():

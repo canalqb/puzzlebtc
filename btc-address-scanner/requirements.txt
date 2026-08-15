@@ -1,4 +1,4 @@
-# Requirements for Offline
+# Requirements for btc-address-scanner
 # Generated automatically — install with: pip install -r requirements.txt
 
 base58

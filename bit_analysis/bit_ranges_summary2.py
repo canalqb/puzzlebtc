@@ -1,12 +1,17 @@
-Dêe um nome de pasta, e para o script.
-Crie um readme.md para github  já renderizado, não quero ver a estrutura markdown, explicando para que serve o script 
-Deixe bem explicado e bem formatado, com icones e textos com formatações, de negrito, italico, listas de passo a passo, entre outros
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Script: bit_ranges_summary2.py
+Author: CanalQb
+License: MIT
 
-## 📬 Contato
+Gera resumo de faixas de bits para puzzles Bitcoin com análise de
+intervalos, pontos médios e proporções. Inclui integração com
+ice_secp256k1.dll para aceleração de operações.
 
-Feito por [CanalQb no GitHub](https://github.com/canalqb)
-Visite o blog: [canalqb.blogspot.com](https://canalqb.blogspot.com/)
-💸 Apoie o projeto via Bitcoin: `13Ve1k5ivByaCQ5yer6GoV84wAtf3kNava`
+Uso:
+    python bit_ranges_summary2.py
+"""
 
 
 import sqlite3
@@ -20,7 +25,8 @@ from bit.format import bytes_to_wif
 from ecdsa import SigningKey, SECP256k1
 import gc  # <= aqui
 import os
-import psutil 
+from pathlib import Path
+import psutil
 from datetime import datetime
 from fractions import Fraction
 
@@ -42,7 +48,10 @@ pasta_saida = 'bit'
 os.makedirs(pasta_saida, exist_ok=True)
 
 # --- Parâmetros de Configuração ---
-CAMINHO_BANCO = "D:/Rodrigo/20052025/blockchair/banco.db"
+CAMINHO_BANCO = os.environ.get(
+    "PUZZLE_DB_PATH",
+    str(Path(__file__).parent.parent / "blockchair" / "banco.db")
+)
 loop_minino = 1024
 loop_maximo = 2048
 

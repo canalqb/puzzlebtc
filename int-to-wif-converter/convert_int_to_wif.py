@@ -27,8 +27,11 @@ import argparse
 import ctypes
 from pathlib import Path
 
-# Configuração da DLL (usando caminho configurável via ambiente)
-DLL_DIR = Path(os.environ.get("ICE_DLL_DIR", str(Path(__file__).parent.parent.parent / "ola")))
+# Configuração da DLL (via ambiente ou relativa ao repo root)
+DLL_DIR = Path(os.environ.get(
+    "ICE_DLL_DIR",
+    str(Path(__file__).parent.parent)  # repo root
+))
 DLL_PATH = DLL_DIR / "ice_secp256k1.dll"
 
 # Parametros da curva secp256k1

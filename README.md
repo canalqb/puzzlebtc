@@ -47,7 +47,7 @@ puzzlebtc/
 │   └── gerar_chaves_multibase.py
 ├── log2-midpoint-estimator/          # Estimador log2
 │   └── prever_meio_intervalo.py
-├── btc_normalizer/                   # Normalizador BTC
+├── btc-normalizer/                  # Normalizador BTC
 │   └── normalizador_hex_proporcional.py
 └── puzzle.txt                        # Lista de endereços alvo
 ```
@@ -74,14 +74,14 @@ cd btc-from-bytes && pip install -r requirements.txt && pip install -e .
 
 ### Aceleração com ice_secp256k1.dll (Opcional)
 
-Para aceleração de operações de multiplicação escalar, coloque a `ice_secp256k1.dll` em `C:\Users\Qb\Desktop\ola\` ou defina a variável de ambiente:
+Para aceleração de operações de multiplicação escalar, coloque a `ice_secp256k1.dll` no **diretório raiz do projeto** (`puzzlebtc/`) ou defina a variável de ambiente:
 
 ```bash
 # Windows
-set ICE_DLL_PATH=C:\Users\Qb\Desktop\ola\ice_secp256k1.dll
+set ICE_DLL_PATH=%CD%\ice_secp256k1.dll
 
 # Linux/Mac
-export ICE_DLL_PATH=/c/Users/Qb/Desktop/ola/ice_secp256k1.dll
+export ICE_DLL_PATH=/path/to/puzzlebtc/ice_secp256k1.dll
 ```
 
 ## Uso
@@ -113,8 +113,10 @@ python kangaroo_CanalQb.py --start 73786976294838206464 --end 147573952589676412
 
 ```bash
 cd Offline
-python Puzzle.py -banco partes_hex_0.db
+python Puzzle.py -banco partes_hex_0.db --dll ./ice_secp256k1.dll
 ```
+
+> Ou defina `ICE_DLL_PATH` no ambiente: veja a seção "Aceleração com ice_secp256k1.dll" acima.
 
 ### 4. Gerenciador Multiprocesso
 

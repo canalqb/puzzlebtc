@@ -1,0 +1,5 @@
+# requirements.txt — riemann-zero-finder\riemann-zero-sampler
+# Dependências específicas deste diretório.
+
+bit
+mpmath

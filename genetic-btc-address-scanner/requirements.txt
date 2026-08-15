@@ -1,10 +1,10 @@
-# Requirements for Offline
+# Requirements for genetic-btc-address-scanner
 # Generated automatically — install with: pip install -r requirements.txt
 
-base58
 base58>=23.1.0
 bit
 bit>=0.0.5
+deap
 deap>=1.3.1
 ecdsa>=0.16.1
 numpy>=1.24.0

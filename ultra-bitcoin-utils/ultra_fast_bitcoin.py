@@ -55,10 +55,12 @@ CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
 TAMANHO_LOTE_CONSULTA = 20000
 ENDERECO_TESTE = "34xp4vrocgjym3xr7ycvpfhocnxv4twseo"
 
-# Configuração da DLL
+# Configuração via ambiente (compátibilidade Windows/Linux/Mac)
+# O caminho da DLL é resolvido pela variável de ambiente ICE_DLL_PATH.
+# Se não definida, procura ice_secp256k1.dll no diretório raiz do projeto.
 DLL_PATH = Path(os.environ.get(
     "ICE_DLL_PATH",
-    str(Path(__file__).parent.parent.parent / "ola" / "ice_secp256k1.dll")
+    str(Path(__file__).parent.parent / "ice_secp256k1.dll")
 ))
 
 

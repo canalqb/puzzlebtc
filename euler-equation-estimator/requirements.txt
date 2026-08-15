@@ -1,15 +1,14 @@
-# Requirements for Offline
+# Requirements for euler-equation-estimator
 # Generated automatically — install with: pip install -r requirements.txt
 
-base58
 base58>=23.1.0
-bit
 bit>=0.0.5
 deap>=1.3.1
 ecdsa>=0.16.1
+numpy
 numpy>=1.24.0
 pandas>=2.0.0
-psutil
 psutil>=5.9.0
 requests>=2.31.0
+scipy
 scipy>=1.10.0

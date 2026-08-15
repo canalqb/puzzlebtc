@@ -11,7 +11,7 @@ Integra com ice_secp256k1.dll para aceleração de operações quando disponíve
 
 Usage:
     python Puzzle.py -banco partes_hex_0.db
-    python Puzzle.py --banco partes_hex_0.db --dll C:\\Users\\Qb\\Desktop\\ola\\ice_secp256k1.dll
+    python Puzzle.py --banco partes_hex_0.db --dll ice_secp256k1.dll (em project root)
 """
 
 import os
@@ -37,12 +37,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Configuração da DLL
-DLL_PATH = Path(
-    os.environ.get(
-        "ICE_DLL_PATH",
-        str(Path(__file__).parent.parent.parent / "ola" / "ice_secp256k1.dll")
-    )
-)
+# O caminho da DLL é resolvido pela variável de ambiente ICE_DLL_PATH.
+# Se não definida, procura ice_secp256k1.dll no diretório raiz do projeto.
+DLL_PATH = Path(os.environ.get(
+    "ICE_DLL_PATH",
+    str(Path(__file__).parent.parent / "ice_secp256k1.dll")
+))
 
 # Parâmetros da curva secp256k1
 GROUP_ORDER = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141

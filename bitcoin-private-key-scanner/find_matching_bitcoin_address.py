@@ -33,8 +33,11 @@ CHECKPOINT_FILE = SCRIPT_DIR / "checkpoint.txt"
 OUTPUT_DIR = Path(os.environ.get("PUZZLE_OUTPUT_DIR", str(SCRIPT_DIR / "output")))
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Caminho da DLL (suporta ambiente)
-DLL_DIR = Path(os.environ.get("ICE_DLL_DIR", str(SCRIPT_DIR.parent.parent.parent / "ola")))
+# Configuração da DLL (via ambiente ou relativa ao repo root)
+DLL_DIR = Path(os.environ.get(
+    "ICE_DLL_DIR",
+    str(Path(__file__).parent.parent)  # repo root
+))
 DLL_PATH = DLL_DIR / "ice_secp256k1.dll"
 
 # Timeout de carregamento da DLL (evita travamento em ambientes sem DLL)
